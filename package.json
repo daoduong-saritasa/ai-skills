@@ -1,6 +1,6 @@
 {
   "name": "@daoduong-saritasa/fe-skills",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "AI skills platform for frontend projects",
   "type": "module",
   "main": "dist/index.js",
