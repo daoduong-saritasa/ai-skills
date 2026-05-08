@@ -11,29 +11,9 @@
 - Use `withDefaults` for default prop values.
 - Use named tuple syntax for emits for clarity.
 
-```vue
-<script setup lang="ts">
-const props = withDefaults(defineProps<{
-  title: string
-  count?: number
-}>(), { count: 0 })
-
-const emit = defineEmits<{
-  update: [value: string]
-  close: []
-}>()
-</script>
-```
-
 ## Two-Way Binding
 
 - Use `defineModel` (Vue 3.4+) for two-way binding instead of manual prop + emit pairs.
-
-```vue
-<script setup lang="ts">
-const model = defineModel<string>()
-</script>
-```
 
 ## Component Options
 
@@ -48,12 +28,8 @@ const model = defineModel<string>()
 - Never destructure props directly — it loses reactivity.
 - Use `props.value` or `toRef(() => props.value)` to preserve reactivity.
 
-```ts
-// ❌ Loses reactivity (Vue < 3.5)
-const { title } = defineProps<{ title: string }>()
+> **Vue 3.5+**: Destructuring `defineProps` preserves reactivity via compiler transform. `const { title } = defineProps<...>()` is safe.
 
-// ✅ Preserves reactivity (all versions)
-const titleRef = toRef(() => props.title)
-```
+## References
 
-> **Vue 3.5+**: Destructuring `defineProps` preserves reactivity via compiler transform. `const { title } = defineProps<...>()` is safe. `toRef` pattern still works and is explicit.
+- Props, emits, defineModel, and reactivity examples: `references/vue/composition-api.md`

@@ -19,3 +19,7 @@ Optimize for these from the start of every project:
 - Optimize all images (compress, correct format, explicit `width`/`height`).
 - Use semantic CSS custom properties for theming: `--primary-color`, `--accent-color`, `--tertiary-color`.
 - Avoid unnecessary re-renders; measure before optimizing.
+
+## References
+
+- Code splitting examples for React, Angular, Vue: `references/core/performance.md`

@@ -26,3 +26,7 @@ Use **S-I-D**: Short, Intuitive, Descriptive.
 
 - Set up **EditorConfig, ESLint, Prettier, and Stylelint** on every project.
 - Enforce linting in CI; do not bypass checks.
+
+## References
+
+- Naming and API design examples: `references/core/code-quality.md`

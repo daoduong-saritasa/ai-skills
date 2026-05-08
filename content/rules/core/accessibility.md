@@ -21,3 +21,7 @@ Follow **WCAG 2.1 AA** on every project.
 
 - Ensure all interactive elements are reachable and operable by keyboard.
 - Test with screen readers; use ARIA attributes only when semantic HTML is insufficient.
+
+## References
+
+- HTML examples for labels, semantics, and ARIA: `references/core/accessibility.md`

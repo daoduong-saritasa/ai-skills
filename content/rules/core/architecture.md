@@ -22,10 +22,17 @@ Maintain strict separation between three layers. Never skip or cross layers.
 ## Mappers
 
 - Transform DTOs ↔ Domain Models using a mapper pattern.
-- Use `secureParse` (safe Zod parse that logs but does not throw) to validate DTOs before mapping. `secureParse` wraps `schema.safeParse()` — on failure it logs the error and returns `null`; callers handle the null case instead of catching exceptions.
+- Use `secureParse` (safe Zod parse — logs on failure, returns `null`) to validate DTOs before mapping.
 - Keep all mapping logic centralized in mapper files.
+- See `references/core/secure-parse.md` and `references/core/mapper.md` for full definitions.
 
 ## Mocking
 
 - Mock data in the repository/business layer only (e.g., services with `of()` + `delay()`).
 - Never mock data inside UI components.
+
+## References
+
+- Examples and full implementations: `references/core/architecture.md`
+- `secureParse` definition and usage: `references/core/secure-parse.md`
+- `IMapper` interface and pattern: `references/core/mapper.md`
