@@ -31,7 +31,7 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   const manifest: Manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
   const fw = manifest.framework;
   const fwLabel = fw.charAt(0).toUpperCase() + fw.slice(1);
-  log.info(`Framework: ${fw}  |  Modules: ${manifest.skills.length} → 2 skills`);
+  log.info(`Framework: ${fw}  |  Modules: ${manifest.skills.length} → 1 skill`);
 
   // 2. Select provider
   const provider = await select<Provider>({
@@ -58,8 +58,11 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   const frameworkRaw = rawModules.filter((m) => !m.id.startsWith('core/'));
 
   const groups: SkillGroup[] = [
-    { id: 'core/frontend-developer', label: 'Core Frontend Developer', modules: coreRaw },
-    { id: `${fw}/developer`, label: `${fwLabel} Developer`, modules: frameworkRaw },
+    {
+      id: `${fw}/frontend-developer`,
+      label: `${fwLabel} Frontend Developer`,
+      modules: [...coreRaw, ...frameworkRaw],
+    },
   ];
 
   // 3b. Load reference files from .ai/references/ into a map (id → content)
