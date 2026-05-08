@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "pnpm build"
   },
   "keywords": [
     "ai",
@@ -23,13 +24,6 @@
   ],
   "author": "daoduong-saritasa",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.0.4",
-      "onFail": "download"
-    }
-  },
   "dependencies": {
     "@clack/prompts": "^0.10.1"
   },
