@@ -4,8 +4,8 @@ AI skills platform for frontend projects. Gives your whole team a shared set of 
 
 ## How it works
 
-1. **Project lead** runs `init` once → creates `.ai/` with the team's skills → **committed to git**
-Each dev runs `generate` → reads `.ai/` and creates files for their AI provider → **also committed, or local**
+1. **Project lead** runs `init` once → creates `.ai/` with the team's rules & references → **committed to git**
+2. Each dev runs `generate` → reads `.ai/` and creates skill files for their AI provider → **gitignored or committed per team preference**
 
 ## Commands
 
@@ -19,10 +19,13 @@ Prompts for a framework (Angular / React / Vue), then writes:
 
 ```
 .ai/
-  manifest.json        # framework + skill list
+  manifest.json          # framework + skill list
   rules/
-    core/              # architecture, code-quality, performance, accessibility
-    angular/           # (or react/ or vue/)
+    core/                # architecture, code-quality, performance, accessibility
+    <framework>/         # components, hooks/composables, etc.
+  references/
+    core/                # code examples for core rules
+    <framework>/         # code examples for framework rules
 ```
 
 Run once per project. Re-running prompts before overwriting.
@@ -33,31 +36,43 @@ Run once per project. Re-running prompts before overwriting.
 npx @daoduong-saritasa/fe-skills generate
 ```
 
-Reads `.ai/manifest.json` and generates skill files for your chosen AI provider:
+Reads `.ai/` and generates **one skill folder** for your chosen AI provider:
 
 | Provider | Output |
 |---|---|
-| GitHub Copilot | `.github/skills/<name>/SKILL.md` |
-| Cursor | `.cursor/rules/<name>.mdc` |
-| Claude Code | `.claude/skills/<name>/SKILL.md` |
-| Codex | `AGENTS.md` |
-| Windsurf | `.windsurf/rules/<name>.md` |
+| GitHub Copilot | `.github/skills/<name>/` |
+| Cursor | `.cursor/rules/<name>/` |
+| Claude Code | `.claude/skills/<name>/` |
+| Codex | `.agents/skills/<name>/` |
+| Windsurf | `.windsurf/rules/<name>/` |
 
-Each skill becomes its own file with a `description` so the AI loads it only when relevant — not all rules on every prompt.
+Each skill follows this structure:
 
-If files already exist, you'll be asked to confirm before anything is overwritten. Custom skills you added manually are left untouched.
+```
+<name>/
+├── SKILL.md          # metadata + index guiding the AI to the right reference
+└── references/
+    ├── accessibility.md      # rules + merged code examples
+    ├── architecture.md
+    ├── secure-parse.md       # cross-referenced helpers
+    └── ...
+```
 
-## Included skills
+`SKILL.md` is a lightweight index — it tells the AI which file covers which topic so it loads only what's relevant. The full rules and examples live in `references/`.
+
+If a skill folder already exists, you'll be asked to replace, rename, or skip before anything is overwritten.
+
+## Included rules
 
 | Module | What it covers |
 |---|---|
-| `core/architecture` | Layered architecture, DTOs, mappers |
+| `core/architecture` | Layered architecture, DTOs, mappers, secureParse |
 | `core/code-quality` | SOLID, naming, API design, tooling |
 | `core/performance` | Core Web Vitals, lazy loading, assets |
-| `core/accessibility` | WCAG 2.1 AA, semantic HTML, forms |
+| `core/accessibility` | WCAG 2.1 AA, semantic HTML, forms, ARIA |
 | `angular/components` | Standalone, signals, OnPush, inject() |
 | `angular/rxjs` | Services, operators, subscription management |
-| `angular/forms` | Reactive forms |
+| `angular/forms` | Typed reactive forms |
 | `react/components` | Function placement, memoization, naming |
 | `react/hooks` | Custom hooks, cleanup, dependency arrays |
 | `vue/composition-api` | script setup, defineProps, defineModel |
@@ -76,3 +91,4 @@ mkdir /tmp/test-project && cd /tmp/test-project
 node /path/to/ai-skills-cli/dist/index.js init
 node /path/to/ai-skills-cli/dist/index.js generate
 ```
+
