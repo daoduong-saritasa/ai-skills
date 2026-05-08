@@ -1,6 +1,6 @@
-# @saritasa/fe-skills
+# @daoduong-saritasa/fe-skills
 
-AI skills platform for Saritasa frontend projects. Gives your whole team a shared set of coding standards that each developer loads into their own AI tool.
+AI skills platform for frontend projects. Gives your whole team a shared set of coding standards that each developer loads into their own AI tool.
 
 ## How it works
 
@@ -12,7 +12,7 @@ AI skills platform for Saritasa frontend projects. Gives your whole team a share
 ### `init` — project setup
 
 ```bash
-npx @saritasa/fe-skills init
+npx @daoduong-saritasa/fe-skills init
 ```
 
 Prompts for a framework (Angular / React / Vue), then writes:
@@ -30,7 +30,7 @@ Run once per project. Re-running prompts before overwriting.
 ### `generate` — per-developer
 
 ```bash
-npx @saritasa/fe-skills generate
+npx @daoduong-saritasa/fe-skills generate
 ```
 
 Reads `.ai/manifest.json` and generates skill files for your chosen AI provider:

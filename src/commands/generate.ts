@@ -33,7 +33,7 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   const manifestPath = join(targetDir, '.ai', 'manifest.json');
   if (!existsSync(manifestPath)) {
     log.error(
-      'No .ai/manifest.json found. Run  npx @saritasa/fe-skills init  first to set up the project.',
+      'No .ai/manifest.json found. Run  npx @daoduong-saritasa/fe-skills init  first to set up the project.',
     );
     process.exit(1);
   }

@@ -66,7 +66,7 @@ export async function runInit(targetDir: string = process.cwd()): Promise<void> 
 
   log.success(`Manifest written to .ai/manifest.json`);
   log.info(`Commit the .ai/ folder to git so your whole team shares the same skills.`);
-  log.info(`Each dev runs  npx @saritasa/fe-skills generate  to create their own AI provider files.`);
+  log.info(`Each dev runs  npx @daoduong-saritasa/fe-skills generate  to create their own AI provider files.`);
 
   outro('Done!');
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@saritasa/fe-skills",
+  "name": "@daoduong-saritasa/fe-skills",
   "version": "0.1.0",
-  "description": "AI skills platform for Saritasa frontend projects",
+  "description": "AI skills platform for frontend projects",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -19,9 +19,9 @@
     "angular",
     "react",
     "vue",
-    "saritasa"
+    "daoduong-saritasa"
   ],
-  "author": "Saritasa",
+  "author": "daoduong-saritasa",
   "license": "ISC",
   "devEngines": {
     "packageManager": {
