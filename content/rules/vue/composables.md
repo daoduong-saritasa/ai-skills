@@ -22,4 +22,4 @@
 
 ## References
 
-- `toValue()` usage and return shape examples: `references/vue/composables.md`
+- `toValue()` usage and return shape examples: `references/composables.md`

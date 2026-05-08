@@ -20,4 +20,4 @@
 
 ## References
 
-- Custom hook example with business logic separation: `references/react/hooks.md`
+- Custom hook example with business logic separation: `references/hooks.md`

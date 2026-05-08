@@ -22,4 +22,4 @@ Optimize for these from the start of every project:
 
 ## References
 
-- Code splitting examples for React, Angular, Vue: `references/core/performance.md`
+- Code splitting examples for React, Angular, Vue: `references/performance.md`

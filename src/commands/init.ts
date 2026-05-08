@@ -2,7 +2,7 @@ import { intro, outro, select, confirm, spinner, log } from '@clack/prompts';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
 import type { Framework, Manifest } from '../types.js';
-import { loadCoreModules, loadFrameworkModules } from '../skills/loader.js';
+import { loadCoreModules, loadFrameworkModules, loadCoreReferences, loadFrameworkReferences } from '../skills/loader.js';
 
 const PACKAGE_VERSION = '0.1.0';
 
@@ -41,6 +41,10 @@ export async function runInit(targetDir: string = process.cwd()): Promise<void> 
   const frameworkModules = loadFrameworkModules(framework);
   const allModules = [...coreModules, ...frameworkModules];
 
+  const coreReferences = loadCoreReferences();
+  const frameworkReferences = loadFrameworkReferences(framework);
+  const allReferences = [...coreReferences, ...frameworkReferences];
+
   const s = spinner();
   s.start('Writing .ai/ folder…');
 
@@ -52,6 +56,14 @@ export async function runInit(targetDir: string = process.cwd()): Promise<void> 
     const dest = join(rulesDir, `${module.id}.md`);
     mkdirSync(resolve(dest, '..'), { recursive: true });
     writeFileSync(dest, module.content, 'utf-8');
+  }
+
+  // Write all core + framework reference files into .ai/references/
+  const referencesDir = join(aiDir, 'references');
+  for (const ref of allReferences) {
+    const dest = join(referencesDir, `${ref.id}.md`);
+    mkdirSync(resolve(dest, '..'), { recursive: true });
+    writeFileSync(dest, ref.content, 'utf-8');
   }
 
   // Write manifest

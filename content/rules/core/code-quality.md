@@ -29,4 +29,4 @@ Use **S-I-D**: Short, Intuitive, Descriptive.
 
 ## References
 
-- Naming and API design examples: `references/core/code-quality.md`
+- Naming and API design examples: `references/code-quality.md`

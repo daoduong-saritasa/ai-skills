@@ -32,4 +32,4 @@
 
 ## References
 
-- Props, emits, defineModel, and reactivity examples: `references/vue/composition-api.md`
+- Props, emits, defineModel, and reactivity examples: `references/composition-api.md`

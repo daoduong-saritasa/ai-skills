@@ -24,4 +24,4 @@ Follow **WCAG 2.1 AA** on every project.
 
 ## References
 
-- HTML examples for labels, semantics, and ARIA: `references/core/accessibility.md`
+- HTML examples for labels, semantics, and ARIA: `references/accessibility.md`

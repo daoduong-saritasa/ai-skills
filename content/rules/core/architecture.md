@@ -24,7 +24,7 @@ Maintain strict separation between three layers. Never skip or cross layers.
 - Transform DTOs ↔ Domain Models using a mapper pattern.
 - Use `secureParse` (safe Zod parse — logs on failure, returns `null`) to validate DTOs before mapping.
 - Keep all mapping logic centralized in mapper files.
-- See `references/core/secure-parse.md` and `references/core/mapper.md` for full definitions.
+- See `references/secure-parse.md` and `references/mapper.md` for full definitions.
 
 ## Mocking
 
@@ -33,6 +33,6 @@ Maintain strict separation between three layers. Never skip or cross layers.
 
 ## References
 
-- Examples and full implementations: `references/core/architecture.md`
-- `secureParse` definition and usage: `references/core/secure-parse.md`
-- `IMapper` interface and pattern: `references/core/mapper.md`
+- Examples and full implementations: `references/architecture.md`
+- `secureParse` definition and usage: `references/secure-parse.md`
+- `IMapper` interface and pattern: `references/mapper.md`

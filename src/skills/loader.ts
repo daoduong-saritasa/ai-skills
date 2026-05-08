@@ -8,6 +8,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 // When installed as npm package: content/ lives at package root (next to dist/)
 // During development: content/ lives at project root
 const CONTENT_ROOT = resolve(__dirname, '../content/rules');
+const REFERENCES_ROOT = resolve(__dirname, '../content/references');
 
 function readModulesFromDir(dir: string, base: string): SkillModule[] {
   const modules: SkillModule[] = [];
@@ -37,4 +38,14 @@ export function loadModuleById(id: string): SkillModule {
   const content = readFileSync(filePath, 'utf-8');
   const label = id.replace(/\//g, ' › ').replace(/-/g, ' ');
   return { id, label, content };
+}
+
+export function loadCoreReferences(): SkillModule[] {
+  const dir = join(REFERENCES_ROOT, 'core');
+  return readModulesFromDir(dir, REFERENCES_ROOT);
+}
+
+export function loadFrameworkReferences(framework: Framework): SkillModule[] {
+  const dir = join(REFERENCES_ROOT, framework);
+  return readModulesFromDir(dir, REFERENCES_ROOT);
 }

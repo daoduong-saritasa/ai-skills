@@ -49,4 +49,4 @@
 
 ## References
 
-- Full component example with signals and native control flow: `references/angular/components.md`
+- Full component example with signals and native control flow: `references/components.md`

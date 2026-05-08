@@ -7,4 +7,4 @@
 
 ## References
 
-- Typed reactive form example: `references/angular/forms.md`
+- Typed reactive form example: `references/forms.md`

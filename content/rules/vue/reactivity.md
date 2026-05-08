@@ -23,4 +23,4 @@
 
 ## References
 
-- `shallowRef` vs `ref` and watcher cleanup examples: `references/vue/reactivity.md`
+- `shallowRef` vs `ref` and watcher cleanup examples: `references/reactivity.md`

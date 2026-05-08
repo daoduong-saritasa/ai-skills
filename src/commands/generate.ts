@@ -1,6 +1,6 @@
 import { intro, outro, select, text, spinner, log } from '@clack/prompts';
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { join, dirname, relative } from 'path';
 import type { Manifest, Provider, GeneratedFile } from '../types.js';
 import { buildCopilotFiles } from '../providers/copilot.js';
 import { buildCursorFiles } from '../providers/cursor.js';
@@ -10,10 +10,10 @@ import { buildWindsurfFiles } from '../providers/windsurf.js';
 
 const PROVIDER_OUTPUT: Record<Provider, string> = {
   copilot: '.github/skills/<name>/SKILL.md',
-  cursor: '.cursor/rules/<name>.mdc',
+  cursor: '.cursor/rules/<name>/SKILL.mdc',
   claude: '.claude/skills/<name>/SKILL.md',
   codex: '.agents/skills/<name>/SKILL.md',
-  windsurf: '.windsurf/rules/<name>.md',
+  windsurf: '.windsurf/rules/<name>/SKILL.md',
 };
 
 export async function runGenerate(targetDir: string = process.cwd()): Promise<void> {
@@ -52,15 +52,33 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
     return { id, label: id.replace(/\//g, ' › ').replace(/-/g, ' '), content };
   });
 
+  // 3b. Load reference files from .ai/references/ into a map (id → content)
+  const referenceMap = new Map<string, string>();
+  const aiReferencesDir = join(targetDir, '.ai', 'references');
+  if (existsSync(aiReferencesDir)) {
+    const scanRefs = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scanRefs(full);
+        } else if (entry.name.endsWith('.md')) {
+          const id = relative(aiReferencesDir, full).replace(/\\/g, '/').replace(/\.md$/, '');
+          referenceMap.set(id, readFileSync(full, 'utf-8'));
+        }
+      }
+    };
+    scanRefs(aiReferencesDir);
+  }
+
   // 4. Build planned file list (no writes yet)
-  const builders: Record<Provider, (m: typeof modules, d: string) => GeneratedFile[]> = {
+  const builders: Record<Provider, (m: typeof modules, d: string, r: Map<string, string>) => GeneratedFile[]> = {
     copilot: buildCopilotFiles,
     cursor: buildCursorFiles,
     claude: buildClaudeFiles,
     codex: buildCodexFiles,
     windsurf: buildWindsurfFiles,
   };
-  const planned = builders[provider](modules, targetDir);
+  const planned = builders[provider](modules, targetDir, referenceMap);
 
   // 5. Conflict resolution — per skill, before writing anything
   const toWrite: GeneratedFile[] = [];
@@ -92,7 +110,7 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
       });
       if (typeof newName === 'symbol') continue;
       const rebuilt = file.rebuild(newName.trim());
-      toWrite.push({ ...file, skillName: newName.trim(), ...rebuilt });
+      toWrite.push({ ...file, skillName: newName.trim(), ...rebuilt, extraFiles: rebuilt.extraFiles });
     }
   }
 
@@ -109,6 +127,10 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   for (const file of toWrite) {
     mkdirSync(dirname(file.path), { recursive: true });
     writeFileSync(file.path, file.content, 'utf-8');
+    for (const extra of file.extraFiles ?? []) {
+      mkdirSync(dirname(extra.path), { recursive: true });
+      writeFileSync(extra.path, extra.content, 'utf-8');
+    }
   }
 
   s.stop('Files written');

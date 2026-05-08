@@ -29,4 +29,4 @@
 
 ## References
 
-- Event handler and component examples: `references/react/components.md`
+- Event handler and component examples: `references/components.md`

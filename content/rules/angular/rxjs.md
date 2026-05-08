@@ -32,4 +32,4 @@
 
 ## References
 
-- Service with observable state example: `references/angular/rxjs.md`
+- Service with observable state example: `references/rxjs.md`
