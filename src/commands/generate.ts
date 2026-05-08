@@ -1,29 +1,19 @@
-import { intro, outro, select, confirm, spinner, log } from '@clack/prompts';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import type { Manifest, Provider } from '../types.js';
-import { loadModuleById } from '../skills/loader.js';
-import { generateCopilot } from '../providers/copilot.js';
-import { generateCursor } from '../providers/cursor.js';
-import { generateClaude } from '../providers/claude.js';
-import { generateCodex } from '../providers/codex.js';
-import { generateWindsurf } from '../providers/windsurf.js';
+import { intro, outro, select, text, spinner, log } from '@clack/prompts';
+import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { join, dirname } from 'path';
+import type { Manifest, Provider, GeneratedFile } from '../types.js';
+import { buildCopilotFiles } from '../providers/copilot.js';
+import { buildCursorFiles } from '../providers/cursor.js';
+import { buildClaudeFiles } from '../providers/claude.js';
+import { buildCodexFiles } from '../providers/codex.js';
+import { buildWindsurfFiles } from '../providers/windsurf.js';
 
 const PROVIDER_OUTPUT: Record<Provider, string> = {
   copilot: '.github/skills/<name>/SKILL.md',
   cursor: '.cursor/rules/<name>.mdc',
   claude: '.claude/skills/<name>/SKILL.md',
-  codex: 'AGENTS.md',
+  codex: '.agents/skills/<name>/SKILL.md',
   windsurf: '.windsurf/rules/<name>.md',
-};
-
-/** Root directory that each provider writes into */
-const PROVIDER_DIR: Record<Provider, string> = {
-  copilot: '.github/skills',
-  cursor: '.cursor/rules',
-  claude: '.claude/skills',
-  codex: '',          // single file, checked separately
-  windsurf: '.windsurf/rules',
 };
 
 export async function runGenerate(targetDir: string = process.cwd()): Promise<void> {
@@ -33,7 +23,7 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   const manifestPath = join(targetDir, '.ai', 'manifest.json');
   if (!existsSync(manifestPath)) {
     log.error(
-      'No .ai/manifest.json found. Run  npx @daoduong-saritasa/fe-skills init  first to set up the project.',
+      'No .ai/manifest.json found. Run  npx @saritasa/fe-skills init  first to set up the project.',
     );
     process.exit(1);
   }
@@ -48,69 +38,80 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
       { value: 'copilot', label: 'GitHub Copilot', hint: PROVIDER_OUTPUT.copilot },
       { value: 'cursor', label: 'Cursor', hint: PROVIDER_OUTPUT.cursor },
       { value: 'claude', label: 'Claude Code', hint: PROVIDER_OUTPUT.claude },
-      { value: 'codex', label: 'Codex / AGENTS.md', hint: PROVIDER_OUTPUT.codex },
+      { value: 'codex', label: 'Codex', hint: PROVIDER_OUTPUT.codex },
       { value: 'windsurf', label: 'Windsurf', hint: PROVIDER_OUTPUT.windsurf },
     ],
   });
 
   if (typeof provider === 'symbol') process.exit(0);
 
-  // Check if provider output already has files and confirm overwrite
-  const providerDir = PROVIDER_DIR[provider];
-  const existingPath = providerDir
-    ? join(targetDir, providerDir)
-    : join(targetDir, 'AGENTS.md');
-
-  if (existsSync(existingPath)) {
-    const label = providerDir || 'AGENTS.md';
-    log.warn(`${label} already exists.`);
-    log.info('Files matching your skill module names will be overwritten. Any other custom skills in that folder will be left untouched.');
-    const ok = await confirm({
-      message: 'Continue and overwrite generated skill files?',
-      initialValue: true,
-    });
-    if (!ok || typeof ok === 'symbol') {
-      log.info('Cancelled. No files were changed.');
-      process.exit(0);
-    }
-  }
-
-  const s = spinner();
-  s.start(`Generating ${provider} files…`);
-
-  // 3. Load selected skill modules from .ai/rules/
+  // 3. Load skill modules from .ai/rules/
   const modules = manifest.skills.map((id) => {
     const filePath = join(targetDir, '.ai', 'rules', `${id}.md`);
     const content = readFileSync(filePath, 'utf-8');
-    return {
-      id,
-      label: id.replace(/\//g, ' › ').replace(/-/g, ' '),
-      content,
-    };
+    return { id, label: id.replace(/\//g, ' › ').replace(/-/g, ' '), content };
   });
 
-  // 4. Generate provider files
-  switch (provider) {
-    case 'copilot':
-      generateCopilot(modules, targetDir);
-      break;
-    case 'cursor':
-      generateCursor(modules, targetDir);
-      break;
-    case 'claude':
-      generateClaude(modules, targetDir);
-      break;
-    case 'codex':
-      generateCodex(modules, targetDir);
-      break;
-    case 'windsurf':
-      generateWindsurf(modules, targetDir);
-      break;
+  // 4. Build planned file list (no writes yet)
+  const builders: Record<Provider, (m: typeof modules, d: string) => GeneratedFile[]> = {
+    copilot: buildCopilotFiles,
+    cursor: buildCursorFiles,
+    claude: buildClaudeFiles,
+    codex: buildCodexFiles,
+    windsurf: buildWindsurfFiles,
+  };
+  const planned = builders[provider](modules, targetDir);
+
+  // 5. Conflict resolution — per skill, before writing anything
+  const toWrite: GeneratedFile[] = [];
+
+  for (const file of planned) {
+    if (!existsSync(file.path)) {
+      toWrite.push(file);
+      continue;
+    }
+
+    const action = await select<'replace' | 'rename' | 'skip'>({
+      message: `Skill "${file.skillName}" already exists. What do you want to do?`,
+      options: [
+        { value: 'replace', label: 'Replace it with the new version' },
+        { value: 'rename', label: 'Save new one under a different name' },
+        { value: 'skip', label: 'Skip — keep existing' },
+      ],
+    });
+
+    if (typeof action === 'symbol' || action === 'skip') continue;
+
+    if (action === 'replace') {
+      toWrite.push(file);
+    } else {
+      const newName = await text({
+        message: `New skill name for "${file.skillName}":`,
+        placeholder: `${file.skillName}-new`,
+        validate: (v) => (v.trim().length === 0 ? 'Name cannot be empty' : undefined),
+      });
+      if (typeof newName === 'symbol') continue;
+      const rebuilt = file.rebuild(newName.trim());
+      toWrite.push({ ...file, skillName: newName.trim(), ...rebuilt });
+    }
   }
 
-  s.stop('Files generated');
+  if (toWrite.length === 0) {
+    log.info('Nothing to write.');
+    outro('Done.');
+    return;
+  }
 
-  log.success(`Output: ${PROVIDER_OUTPUT[provider]}`);
+  // 6. Write resolved files
+  const s = spinner();
+  s.start(`Writing ${toWrite.length} skill file(s)…`);
 
+  for (const file of toWrite) {
+    mkdirSync(dirname(file.path), { recursive: true });
+    writeFileSync(file.path, file.content, 'utf-8');
+  }
+
+  s.stop('Files written');
+  log.success(`${toWrite.length} skill(s) written → ${PROVIDER_OUTPUT[provider]}`);
   outro('Done! Your AI provider is now loaded with the team skills.');
 }
