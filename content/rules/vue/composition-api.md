@@ -49,9 +49,11 @@ const model = defineModel<string>()
 - Use `props.value` or `toRef(() => props.value)` to preserve reactivity.
 
 ```ts
-// ❌ Loses reactivity
+// ❌ Loses reactivity (Vue < 3.5)
 const { title } = defineProps<{ title: string }>()
 
-// ✅ Preserves reactivity
+// ✅ Preserves reactivity (all versions)
 const titleRef = toRef(() => props.title)
 ```
+
+> **Vue 3.5+**: Destructuring `defineProps` preserves reactivity via compiler transform. `const { title } = defineProps<...>()` is safe. `toRef` pattern still works and is explicit.

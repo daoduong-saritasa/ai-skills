@@ -11,7 +11,7 @@ Follow **WCAG 2.1 AA** on every project.
 ## Forms
 
 - Every form control must have an associated `<label>` (not a placeholder used as label).
-- Add `title` attribute on controls/links that have no descriptive text.
+- Add `aria-label` or visually-hidden text on controls/links that have no descriptive text. Avoid `title` — inconsistently announced by screen readers.
 
 ## Reusable Components
 

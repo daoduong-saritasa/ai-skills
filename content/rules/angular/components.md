@@ -52,7 +52,7 @@
 ```typescript
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule],
+  imports: [],
   template: `
     @if (loading()) { <div>Loading...</div> }
     @for (user of users(); track user.id) {

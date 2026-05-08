@@ -37,10 +37,6 @@ const handleRowClick = useCallback((params: { row: Row; index: number }) => {
 - Use `useCallback` for functions passed to memoized child components.
 - Do not over-memoize — only apply when there is a measurable benefit.
 
-## Naming
-
-- Don't duplicate context: `MenuItem.handleClick()` not `MenuItem.handleMenuItemClick()`.
-
 ## Example: Component with Extracted Logic
 
 ```tsx
@@ -57,12 +53,11 @@ export const DataTable = memo<DataTableProps>(({ data, onRowClick }) => {
     [onRowClick],
   );
 
+  // handleRowClick passed directly — no inline arrow, no new ref per render
   return (
     <div role="table">
       {visibleRows.map((row, index) => (
-        <button key={row.id} type="button" onClick={() => handleRowClick({ row, index })}>
-          {row.label}
-        </button>
+        <DataRow key={row.id} row={row} index={index} onRowClick={handleRowClick} />
       ))}
     </div>
   );

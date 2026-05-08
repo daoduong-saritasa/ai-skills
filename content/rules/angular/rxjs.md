@@ -46,7 +46,8 @@ export class UserService {
     return this.http.get<unknown[]>('/users').pipe(
       map(dtos => dtos.map(dto => this.mapper.fromDto(dto))),
       tap(users => this.usersSubject.next(users)),
-      catchError(err => { console.error(err); throw err; }),
+      catchError(err => { console.error(err); return EMPTY; }),
+      // Or push to error state: catchError(err => { this.errorSubject.next(err.message); return EMPTY; })
     );
   }
 }

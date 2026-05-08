@@ -22,7 +22,7 @@ Maintain strict separation between three layers. Never skip or cross layers.
 ## Mappers
 
 - Transform DTOs ↔ Domain Models using a mapper pattern.
-- Use `secureParse` (safe Zod parse that logs but does not throw) to validate DTOs before mapping.
+- Use `secureParse` (safe Zod parse that logs but does not throw) to validate DTOs before mapping. `secureParse` wraps `schema.safeParse()` — on failure it logs the error and returns `null`; callers handle the null case instead of catching exceptions.
 - Keep all mapping logic centralized in mapper files.
 
 ## Mocking

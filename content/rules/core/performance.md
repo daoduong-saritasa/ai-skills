@@ -5,7 +5,7 @@
 Optimize for these from the start of every project:
 
 - **LCP** (Largest Contentful Paint): < 2.5s
-- **FID** (First Input Delay): < 100ms
+- **INP** (Interaction to Next Paint): < 200ms _(replaces FID, measured since Mar 2024)_
 - **CLS** (Cumulative Layout Shift): < 0.1
 
 ## Loading Strategy
