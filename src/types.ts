@@ -17,6 +17,15 @@ export interface SkillModule {
   content: string;
 }
 
+export interface SkillGroup {
+  /** e.g. "core/frontend-developer" */
+  id: string;
+  /** Human-readable label, e.g. "Core Frontend Developer" */
+  label: string;
+  /** Individual rule modules that make up this skill */
+  modules: SkillModule[];
+}
+
 export interface GeneratedFile {
   /** Skill name slug used as key and shown in conflict prompts */
   skillName: string;

@@ -1,7 +1,7 @@
 import { intro, outro, select, text, spinner, log } from '@clack/prompts';
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, dirname, relative } from 'path';
-import type { Manifest, Provider, GeneratedFile } from '../types.js';
+import type { Manifest, Provider, GeneratedFile, SkillGroup } from '../types.js';
 import { buildCopilotFiles } from '../providers/copilot.js';
 import { buildCursorFiles } from '../providers/cursor.js';
 import { buildClaudeFiles } from '../providers/claude.js';
@@ -29,7 +29,9 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   }
 
   const manifest: Manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
-  log.info(`Framework: ${manifest.framework}  |  Skills: ${manifest.skills.length} modules`);
+  const fw = manifest.framework;
+  const fwLabel = fw.charAt(0).toUpperCase() + fw.slice(1);
+  log.info(`Framework: ${fw}  |  Modules: ${manifest.skills.length} → 2 skills`);
 
   // 2. Select provider
   const provider = await select<Provider>({
@@ -45,12 +47,20 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
 
   if (typeof provider === 'symbol') process.exit(0);
 
-  // 3. Load skill modules from .ai/rules/
-  const modules = manifest.skills.map((id) => {
+  // 3. Load skill modules from .ai/rules/ and group into 2 skills
+  const rawModules = manifest.skills.map((id) => {
     const filePath = join(targetDir, '.ai', 'rules', `${id}.md`);
     const content = readFileSync(filePath, 'utf-8');
     return { id, label: id.replace(/\//g, ' › ').replace(/-/g, ' '), content };
   });
+
+  const coreRaw = rawModules.filter((m) => m.id.startsWith('core/'));
+  const frameworkRaw = rawModules.filter((m) => !m.id.startsWith('core/'));
+
+  const groups: SkillGroup[] = [
+    { id: 'core/frontend-developer', label: 'Core Frontend Developer', modules: coreRaw },
+    { id: `${fw}/developer`, label: `${fwLabel} Developer`, modules: frameworkRaw },
+  ];
 
   // 3b. Load reference files from .ai/references/ into a map (id → content)
   const referenceMap = new Map<string, string>();
@@ -71,14 +81,14 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   }
 
   // 4. Build planned file list (no writes yet)
-  const builders: Record<Provider, (m: typeof modules, d: string, r: Map<string, string>) => GeneratedFile[]> = {
+  const builders: Record<Provider, (g: SkillGroup[], d: string, r: Map<string, string>) => GeneratedFile[]> = {
     copilot: buildCopilotFiles,
     cursor: buildCursorFiles,
     claude: buildClaudeFiles,
     codex: buildCodexFiles,
     windsurf: buildWindsurfFiles,
   };
-  const planned = builders[provider](modules, targetDir, referenceMap);
+  const planned = builders[provider](groups, targetDir, referenceMap);
 
   // 5. Conflict resolution — per skill, before writing anything
   const toWrite: GeneratedFile[] = [];

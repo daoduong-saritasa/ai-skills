@@ -1,28 +1,28 @@
 import { join } from 'path';
-import type { SkillModule, GeneratedFile } from '../types.js';
-import { extractDescription, toSkillName, buildExtraFiles } from './utils.js';
+import type { SkillGroup, GeneratedFile } from '../types.js';
+import { toSkillName, buildGroupContent } from './utils.js';
 
 /**
  * Codex — .agents/skills/<name>/SKILL.md
  * https://developers.openai.com/codex/skills
  */
 export function buildCodexFiles(
-  modules: SkillModule[],
+  groups: SkillGroup[],
   targetDir: string,
   referenceMap: Map<string, string>,
 ): GeneratedFile[] {
   const skillsDir = join(targetDir, '.agents', 'skills');
 
-  return modules.map((module) => {
-    const name = toSkillName(module.id);
-    const description = extractDescription(module);
+  return groups.map((group) => {
+    const name = toSkillName(group.id);
+    const description = `${group.label}. Use when working on ${group.label.toLowerCase()}.`;
 
     const build = (n: string) => {
       const skillDir = join(skillsDir, n);
-      const extraFiles = buildExtraFiles(module, skillDir, referenceMap);
+      const { guideContent, extraFiles } = buildGroupContent(group, skillDir, referenceMap);
       return {
         path: join(skillDir, 'SKILL.md'),
-        content: `---\nname: ${n}\ndescription: ${description}\n---\n\n` + module.content.trim(),
+        content: `---\nname: ${n}\ndescription: ${description}\n---\n\n` + guideContent,
         ...(extraFiles.length > 0 && { extraFiles }),
       };
     };
