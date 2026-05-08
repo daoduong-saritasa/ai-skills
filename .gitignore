@@ -1,12 +1,4 @@
 node_modules/
 dist/
-
-# AI provider files — generated locally by each dev via `fe-skills generate`
-# Do NOT commit these; commit .ai/ instead
-.cursor/
-.windsurf/
-.claude/
-.github/skills/
-AGENTS.md
 dist
 node_modules

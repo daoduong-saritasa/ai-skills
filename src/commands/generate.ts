@@ -26,14 +26,6 @@ const PROVIDER_DIR: Record<Provider, string> = {
   windsurf: '.windsurf/rules',
 };
 
-const GITIGNORE_HINT: Record<Provider, string> = {
-  copilot: '.github/skills/',
-  cursor: '.cursor/',
-  claude: '.claude/',
-  codex: 'AGENTS.md',
-  windsurf: '.windsurf/',
-};
-
 export async function runGenerate(targetDir: string = process.cwd()): Promise<void> {
   intro('fe-skills generate — create AI provider files from .ai/');
 
@@ -119,7 +111,6 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
   s.stop('Files generated');
 
   log.success(`Output: ${PROVIDER_OUTPUT[provider]}`);
-  log.warn(`Remember to add ${GITIGNORE_HINT[provider]} to .gitignore — these are local dev files.`);
 
   outro('Done! Your AI provider is now loaded with the team skills.');
 }
