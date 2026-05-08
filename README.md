@@ -4,8 +4,8 @@ AI skills platform for frontend projects. Gives your whole team a shared set of 
 
 ## How it works
 
-1. **Project lead** runs `init` once → creates `.ai/` with the team's rules & references → **committed to git**
-2. Each dev runs `generate` → reads `.ai/` and creates skill files for their AI provider → **gitignored or committed per team preference**
+1. Runs `init` once → creates `.ai/` with the team's rules & references
+2. Each dev runs `generate` → reads `.ai/` and creates skill files for their AI provider
 
 ## Commands
 
