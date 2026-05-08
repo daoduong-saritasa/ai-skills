@@ -1,6 +1,6 @@
 {
   "name": "@daoduong-saritasa/fe-skills",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI skills platform for frontend projects",
   "type": "module",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
     "fe-skills": "dist/index.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && chmod +x dist/index.js",
     "dev": "tsup --watch",
     "start": "node dist/index.js",
     "prepublishOnly": "pnpm build"
