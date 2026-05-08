@@ -12,7 +12,7 @@ AI skills platform for frontend projects. Gives your whole team a shared set of 
 ### `init` — project setup
 
 ```bash
-npx @daoduong-saritasa/fe-skills init
+npx @daoduong-saritasa/fe-skills@latest init
 ```
 
 Prompts for a framework (Angular / React / Vue), then writes:
@@ -33,7 +33,7 @@ Run once per project. Re-running prompts before overwriting.
 ### `generate` — per-developer
 
 ```bash
-npx @daoduong-saritasa/fe-skills generate
+npx @daoduong-saritasa/fe-skills@latest generate
 ```
 
 Reads `.ai/` and generates **one skill folder** for your chosen AI provider:
