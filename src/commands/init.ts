@@ -31,6 +31,7 @@ export async function runInit(targetDir: string = process.cwd()): Promise<void> 
       { value: 'angular', label: 'Angular' },
       { value: 'react', label: 'React' },
       { value: 'vue', label: 'Vue' },
+      { value: 'none', label: 'No framework', hint: 'core skills only' },
     ],
   });
 
@@ -38,11 +39,11 @@ export async function runInit(targetDir: string = process.cwd()): Promise<void> 
 
   // Core + selected framework modules are always included — no picking
   const coreModules = loadCoreModules();
-  const frameworkModules = loadFrameworkModules(framework);
+  const frameworkModules = framework !== 'none' ? loadFrameworkModules(framework) : [];
   const allModules = [...coreModules, ...frameworkModules];
 
   const coreReferences = loadCoreReferences();
-  const frameworkReferences = loadFrameworkReferences(framework);
+  const frameworkReferences = framework !== 'none' ? loadFrameworkReferences(framework) : [];
   const allReferences = [...coreReferences, ...frameworkReferences];
 
   const s = spinner();

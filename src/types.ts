@@ -1,4 +1,4 @@
-export type Framework = 'angular' | 'react' | 'vue';
+export type Framework = 'angular' | 'react' | 'vue' | 'none';
 
 export type Provider = 'copilot' | 'cursor' | 'claude' | 'codex' | 'windsurf';
 

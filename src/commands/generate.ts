@@ -30,7 +30,8 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
 
   const manifest: Manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
   const fw = manifest.framework;
-  const fwLabel = fw.charAt(0).toUpperCase() + fw.slice(1);
+  const isNoFramework = fw === 'none';
+  const fwLabel = isNoFramework ? 'Core' : fw.charAt(0).toUpperCase() + fw.slice(1);
   log.info(`Framework: ${fw}  |  Modules: ${manifest.skills.length} → 1 skill`);
 
   // 2. Select provider
@@ -59,7 +60,7 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
 
   const groups: SkillGroup[] = [
     {
-      id: `${fw}/frontend-developer`,
+      id: isNoFramework ? 'core/frontend-developer' : `${fw}/frontend-developer`,
       label: `${fwLabel} Frontend Developer`,
       modules: [...coreRaw, ...frameworkRaw],
     },
