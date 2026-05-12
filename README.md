@@ -4,39 +4,21 @@ AI skills platform for frontend projects. Gives your whole team a shared set of 
 
 ## How it works
 
-1. Runs `init` once → creates `.ai/` with the team's rules & references
-2. Each dev runs `generate` → reads `.ai/` and creates skill files for their AI provider
+Run `generate` → prompts for framework + AI provider → writes one skill folder for your AI tool, containing all relevant rules and examples.
 
-## Commands
-
-### `init` — project setup
+## Usage
 
 ```bash
-npx @daoduong-saritasa/fe-skills@latest init
-```
-
-Prompts for a framework (Angular / React / Vue), then writes:
-
-```
-.ai/
-  manifest.json          # framework + skill list
-  rules/
-    core/                # architecture, code-quality, performance, accessibility
-    <framework>/         # components, hooks/composables, etc.
-  references/
-    core/                # code examples for core rules
-    <framework>/         # code examples for framework rules
-```
-
-Run once per project. Re-running prompts before overwriting.
-
-### `generate` — per-developer
-
-```bash
+npx @daoduong-saritasa/fe-skills@latest
+# or explicitly:
 npx @daoduong-saritasa/fe-skills@latest generate
 ```
 
-Reads `.ai/` and generates **one skill folder** for your chosen AI provider:
+Prompts for:
+1. Framework (Angular / React / Vue / None)
+2. AI provider
+
+Then generates **one skill folder** for your chosen AI provider:
 
 | Provider | Output |
 |---|---|
@@ -54,11 +36,10 @@ Each skill follows this structure:
 └── references/
     ├── accessibility.md      # rules + merged code examples
     ├── architecture.md
-    ├── secure-parse.md       # cross-referenced helpers
     └── ...
 ```
 
-`SKILL.md` is a lightweight index — it tells the AI which file covers which topic so it loads only what's relevant. The full rules and examples live in `references/`.
+`SKILL.md` is a lightweight index — tells the AI which file covers which topic so it loads only what's relevant. Full rules and examples live in `references/`.
 
 If a skill folder already exists, you'll be asked to replace, rename, or skip before anything is overwritten.
 
@@ -88,7 +69,6 @@ pnpm dev          # watch mode
 
 # Test locally
 mkdir /tmp/test-project && cd /tmp/test-project
-node /path/to/ai-skills-cli/dist/index.js init
 node /path/to/ai-skills-cli/dist/index.js generate
 ```
 

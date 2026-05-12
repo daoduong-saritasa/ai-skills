@@ -34,12 +34,3 @@ export function loadCoreModules(): SkillModule[] {
 export function loadFrameworkModules(framework: Framework): SkillModule[] {
   return loadFromCategory(framework);
 }
-
-// References are now merged into the topic file itself — nothing extra to load.
-export function loadCoreReferences(): SkillModule[] {
-  return [];
-}
-
-export function loadFrameworkReferences(_framework: Framework): SkillModule[] {
-  return [];
-}
