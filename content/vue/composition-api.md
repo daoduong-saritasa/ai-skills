@@ -25,8 +25,8 @@
 
 ## Props Reactivity
 
-- Never destructure props directly — it loses reactivity.
-- Use `props.value` or `toRef(() => props.value)` to preserve reactivity.
+- In Vue < 3.5, never destructure props directly — it loses reactivity.
+- Use `toRef(props, 'propName')` or `toRefs(props)` when you need a reactive prop reference.
 
 > **Vue 3.5+**: Destructuring `defineProps` preserves reactivity via compiler transform. `const { title } = defineProps<...>()` is safe.
 
@@ -66,11 +66,13 @@ const countModel = defineModel<number>('count', { default: 0 })
 ## Props Reactivity
 
 ```ts
-// ❌ Loses reactivity (Vue < 3.5)
-const { title } = defineProps<{ title: string }>()
+const props = defineProps<{ title: string }>()
+
+// ❌ Vue < 3.5: destructuring loses reactivity
+const { title } = props
 
 // ✅ Preserves reactivity (all versions)
-const titleRef = toRef(() => props.title)
+const titleRef = toRef(props, 'title')
 ```
 
 > **Vue 3.5+**: Destructuring `defineProps` preserves reactivity via compiler transform — `const { title } = defineProps<...>()` is safe.

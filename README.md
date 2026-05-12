@@ -54,8 +54,10 @@ If a skill folder already exists, you'll be asked to replace, rename, or skip be
 | `angular/components` | Standalone, signals, OnPush, inject() |
 | `angular/rxjs` | Services, operators, subscription management |
 | `angular/forms` | Typed reactive forms |
+| `angular/routing` | Lazy routes, navigation, guards, resolvers |
 | `react/components` | Function placement, memoization, naming |
 | `react/hooks` | Custom hooks, cleanup, dependency arrays |
+| `react/performance` | Re-renders, memoization, transitions, deferred input |
 | `vue/composition-api` | script setup, defineProps, defineModel |
 | `vue/reactivity` | ref vs shallowRef, computed, watchers |
 | `vue/composables` | Naming, toValue(), return shape |

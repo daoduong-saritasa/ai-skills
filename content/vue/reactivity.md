@@ -2,7 +2,8 @@
 
 ## ref vs shallowRef
 
-- **Prefer `shallowRef`** over `ref` when deep reactivity is not needed — better performance.
+- Use `shallowRef` when deep reactivity is not needed.
+- Keep `ref` as the default; reach for `shallowRef` only for opaque objects, large payloads, or values you replace wholesale.
 - Use `ref` only when nested object mutations must trigger reactivity.
 
 ## computed

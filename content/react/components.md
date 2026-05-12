@@ -7,7 +7,8 @@
 
 ## Event Handlers
 
-- Use **named** event handlers, not inline arrow functions in JSX.
+- Use **named** event handlers when the handler is reused, passed to memoized children, or needs a stable reference.
+- Inline arrow functions are fine for trivial local handlers that are not propagated.
 - Wrap in `useCallback` only when the function is passed to a memoized child component.
 
 ## Template Complexity
