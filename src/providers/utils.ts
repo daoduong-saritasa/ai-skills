@@ -37,18 +37,18 @@ export function buildGroupContent(
   skillDir: string,
   referenceMap: Map<string, string>,
 ): { guideContent: string; extraFiles: { path: string; content: string }[] } {
-  const category = group.id.split('/')[0]; // 'core' | 'react' | 'angular' | 'vue'
   const extraFiles: { path: string; content: string }[] = [];
   const seenPaths = new Set<string>();
   const sections: string[] = [];
 
   for (const module of group.modules) {
+    const moduleCategory = module.id.split('/')[0]; // 'core' | 'react' | 'angular' | 'vue'
     const basename = module.id.split('/').pop()!; // e.g. 'accessibility'
     const ruleFileName = `${basename}.md`;
     const rulePath = join(skillDir, 'references', ruleFileName);
 
     // Merge rule content with its matching examples from the referenceMap (same basename)
-    const examplesContent = referenceMap.get(`${category}/${basename}`);
+    const examplesContent = referenceMap.get(`${moduleCategory}/${basename}`);
     const combinedContent = examplesContent
       ? `${module.content.trim()}\n\n---\n\n${examplesContent.trim()}`
       : module.content;
@@ -73,7 +73,7 @@ export function buildGroupContent(
       const refPath = join(skillDir, 'references', fileName);
       if (!seenPaths.has(refPath)) {
         seenPaths.add(refPath);
-        const content = referenceMap.get(`${category}/${fileName.replace(/\.md$/, '')}`);
+        const content = referenceMap.get(`${moduleCategory}/${fileName.replace(/\.md$/, '')}`);
         if (content) {
           extraFiles.push({ path: refPath, content });
           additionalRefLinks.push(`\`references/${fileName}\``);

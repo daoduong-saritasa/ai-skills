@@ -1,7 +1,8 @@
 import { intro, outro, select, text, spinner, log } from '@clack/prompts';
-import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'fs';
-import { join, dirname, relative } from 'path';
-import type { Manifest, Provider, GeneratedFile, SkillGroup } from '../types.js';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { join, dirname } from 'path';
+import type { Framework, Provider, GeneratedFile, SkillGroup } from '../types.js';
+import { loadCoreModules, loadFrameworkModules } from '../skills/loader.js';
 import { buildCopilotFiles } from '../providers/copilot.js';
 import { buildCursorFiles } from '../providers/cursor.js';
 import { buildClaudeFiles } from '../providers/claude.js';
@@ -17,22 +18,23 @@ const PROVIDER_OUTPUT: Record<Provider, string> = {
 };
 
 export async function runGenerate(targetDir: string = process.cwd()): Promise<void> {
-  intro('fe-skills generate — create AI provider files from .ai/');
+  intro('fe-skills generate — generate AI provider skill files for your tech stack');
 
-  // 1. Read manifest
-  const manifestPath = join(targetDir, '.ai', 'manifest.json');
-  if (!existsSync(manifestPath)) {
-    log.error(
-      'No .ai/manifest.json found. Run  npx @daoduong-saritasa/fe-skills init  first to set up the project.',
-    );
-    process.exit(1);
-  }
+  // 1. Select framework
+  const fw = await select<Framework>({
+    message: 'Which frontend framework does this project use?',
+    options: [
+      { value: 'angular', label: 'Angular' },
+      { value: 'react', label: 'React' },
+      { value: 'vue', label: 'Vue' },
+      { value: 'none', label: 'No framework', hint: 'core skills only' },
+    ],
+  });
 
-  const manifest: Manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
-  const fw = manifest.framework;
+  if (typeof fw === 'symbol') process.exit(0);
+
   const isNoFramework = fw === 'none';
   const fwLabel = isNoFramework ? 'Core' : fw.charAt(0).toUpperCase() + fw.slice(1);
-  log.info(`Framework: ${fw}  |  Modules: ${manifest.skills.length} → 1 skill`);
 
   // 2. Select provider
   const provider = await select<Provider>({
@@ -48,15 +50,13 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
 
   if (typeof provider === 'symbol') process.exit(0);
 
-  // 3. Load skill modules from .ai/rules/ and group into 2 skills
-  const rawModules = manifest.skills.map((id) => {
-    const filePath = join(targetDir, '.ai', 'rules', `${id}.md`);
-    const content = readFileSync(filePath, 'utf-8');
-    return { id, label: id.replace(/\//g, ' › ').replace(/-/g, ' '), content };
-  });
+  // 3. Load skill modules directly from package content
+  const coreModules = loadCoreModules();
+  const frameworkModules = isNoFramework ? [] : loadFrameworkModules(fw);
+  const allModules = [...coreModules, ...frameworkModules];
 
-  const coreRaw = rawModules.filter((m) => m.id.startsWith('core/'));
-  const frameworkRaw = rawModules.filter((m) => !m.id.startsWith('core/'));
+  const coreRaw = allModules.filter((m) => m.id.startsWith('core/'));
+  const frameworkRaw = allModules.filter((m) => !m.id.startsWith('core/'));
 
   const groups: SkillGroup[] = [
     {
@@ -66,25 +66,9 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
     },
   ];
 
-  // 3b. Load reference files from .ai/references/ into a map (id → content)
-  const referenceMap = new Map<string, string>();
-  const aiReferencesDir = join(targetDir, '.ai', 'references');
-  if (existsSync(aiReferencesDir)) {
-    const scanRefs = (dir: string) => {
-      for (const entry of readdirSync(dir, { withFileTypes: true })) {
-        const full = join(dir, entry.name);
-        if (entry.isDirectory()) {
-          scanRefs(full);
-        } else if (entry.name.endsWith('.md')) {
-          const id = relative(aiReferencesDir, full).replace(/\\/g, '/').replace(/\.md$/, '');
-          referenceMap.set(id, readFileSync(full, 'utf-8'));
-        }
-      }
-    };
-    scanRefs(aiReferencesDir);
-  }
+  log.info(`Framework: ${fw}  |  Modules: ${allModules.length} → 1 skill`);
 
-  // 4. Build planned file list (no writes yet)
+  // 3b. Build planned file list (no writes yet)
   const builders: Record<Provider, (g: SkillGroup[], d: string, r: Map<string, string>) => GeneratedFile[]> = {
     copilot: buildCopilotFiles,
     cursor: buildCursorFiles,
@@ -92,7 +76,7 @@ export async function runGenerate(targetDir: string = process.cwd()): Promise<vo
     codex: buildCodexFiles,
     windsurf: buildWindsurfFiles,
   };
-  const planned = builders[provider](groups, targetDir, referenceMap);
+  const planned = builders[provider](groups, targetDir, new Map());
 
   // 5. Conflict resolution — per skill, before writing anything
   const toWrite: GeneratedFile[] = [];
